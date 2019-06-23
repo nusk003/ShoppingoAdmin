@@ -139,6 +139,11 @@ module.exports = [
         title: true,
       },
       {
+        key: 'editable_products',
+        name: 'Products',
+        link: '/app/tables/products'
+      },
+      {
         key: 'editable_cell',
         name: 'Table Edit',
         link: '/app/tables/editable-cell'
