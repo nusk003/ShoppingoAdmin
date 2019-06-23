@@ -8,7 +8,7 @@ import {
   InfoUpdates, Status,
   Parent, AppLayout, Responsive, Grid,
   SimpleTable, AdvancedTable, TablePlayground,
-  TreeTable, EditableCell,
+  TreeTable, EditableCell, Products,
   ReduxForm, DateTimePicker, CheckboxRadio,
   Switches, Selectbox, Rating,
   SliderRange, Buttons, DialButton,
@@ -64,6 +64,7 @@ class Application extends React.Component {
           <Route path="/app/tables/table-playground" component={TablePlayground} />
           <Route path="/app/tables/tree-table" component={TreeTable} />
           <Route path="/app/tables/editable-cell" component={EditableCell} />
+          <Route path="/app/tables/products" component={Products} />
           { /* Form & Button */ }
           <Route exact path="/app/forms" component={Parent} />
           <Route path="/app/forms/reduxform" component={ReduxForm} />
