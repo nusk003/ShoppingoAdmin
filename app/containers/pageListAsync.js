@@ -89,6 +89,10 @@ export const EditableCell = loadable(() =>
   import ('./Tables/EditableCell'), {
     fallback: <Loading />,
   });
+export const Products = loadable(() =>
+  import ('./Tables/Products'), {
+    fallback: <Loading />,
+  });
 export const TablePlayground = loadable(() =>
   import ('./Tables/TablePlayground'), {
     fallback: <Loading />,
