@@ -6,6 +6,7 @@ export TreeTableDemo from './TreeTableDemo';
 export TreeTableDemoIcon from './TreeTableDemoIcon';
 export EditableCellDemo from './EditableCellDemo';
 export EditableCellFrmDemo from './EditableCellFrmDemo';
+export EditableProductsFrm from './EditableProductsFrm';
 export AdvTableDemo from './AdvTableDemo';
 export AdvFilter from './AdvFilter';
 export StatusLabel from './StatusLabel';
