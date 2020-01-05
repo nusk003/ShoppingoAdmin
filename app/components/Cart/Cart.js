@@ -15,8 +15,15 @@ import Divider from '@material-ui/core/Divider';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import Type from 'dan-styles/Typography.scss';
 import styles from './cart-jss';
+import {connect} from 'react-redux'
+import * as actions from '../../redux/actions'
+import AddToCartButton from '../Product/AddToCartButton';
+import { Modal } from '@material-ui/core';
+import {withRouter} from 'react-router-dom'
 
 class Cart extends React.Component {
+
+  
   render() {
     const {
       classes,
@@ -24,23 +31,53 @@ class Cart extends React.Component {
       close,
       dataCart,
       removeItem,
-      totalPrice,
-      checkout
+      checkout,
+      products,
+      
     } = this.props;
 
-    const getCartItem = dataArray => dataArray.map((item, index) => (
+    let totalPrice = 0
+
+    for (let {product,qty,weight} of products) {
+      
+      totalPrice += qty*product.defaultCombination.sellPrice * (product.weightEnabled ? weight : 1)
+
+    }
+
+    const getCartItem = dataArray => dataArray.map((cartItem, index) => {
+      const {product,qty,weight} = cartItem
+      return(
       <Fragment key={index.toString()}>
         <ListItem>
-          <figure>
-            <img src={item.get('thumbnail')} alt="thumb" />
+          <figure style = {{width : 50,height : 50}} >
+            <img src={product.images[0]} alt="thumb" />
           </figure>
           <ListItemText
-            primary={item.get('name')}
-            secondary={`Quantity: ${item.get('quantity')} Item - USD ${item.get('price') * item.get('quantity')}`}
+            primary={`${product.title} ${product.weightEnabled ? weight : ''} ${product.defaultCombination && product.defaultCombination.value }`}
+            secondary={
+              <div>
+              <p>
+              {`x${qty} Rs.${parseFloat(product.defaultCombination.sellPrice) * (product.weightEnabled ? weight : 1)}`}</p>
+              <AddToCartButton 
+                list
+                qty = {qty} 
+                onAddToCart = {()=>this.props.addToCart({product:{...product,...{}},qty,weight})} 
+                onPlus = {()=>this.props.updateCart(index,{...cartItem,...{qty:parseInt(qty) + 1}})}
+                onMinus = {()=>{
+                  qty===1 ? this.props.removeCart(index)
+                  :
+                  this.props.updateCart(index,{...cartItem,...{qty : parseInt(qty) - 1}})
+                }}
+                onChange = {(qty)=>this.props.updateCart(index,{...cartItem,...{qty}})}
+              />
+              </div>
+            }
             className={classes.itemText}
           />
+          
+          
           <ListItemSecondaryAction>
-            <IconButton aria-label="Comments" onClick={() => removeItem(item)}>
+            <IconButton aria-label="Comments" onClick={() => this.props.removeCart(index)}>
               <DeleteIcon />
             </IconButton>
           </ListItemSecondaryAction>
@@ -48,8 +85,8 @@ class Cart extends React.Component {
         <li>
           <Divider />
         </li>
-      </Fragment>
-    ));
+      </Fragment>)}
+    );
     return (
       <Menu
         id="cart-menu"
@@ -66,32 +103,34 @@ class Cart extends React.Component {
         onClose={close}
         className={classes.cartPanel}
       >
+
         <List
           component="ul"
           subheader={(
             <ListSubheader component="div">
               <ShoppingCartIcon />
               Total:&nbsp;
-              {dataCart.size}
+              {products.length}
               &nbsp;Unique items in Cart
             </ListSubheader>
           )}
+          style = {{backgroundColor : 'white'}}
           className={classes.cartWrap}
         >
           {
-            dataCart.size < 1 ? (
+            products.length < 1 ? (
               <div className={classes.empty}>
                 <Typography variant="subtitle1">Empty Cart</Typography>
                 <Typography variant="caption">Your shopping items will be listed here</Typography>
               </div>
             ) : (
               <Fragment>
-                {getCartItem(dataCart)}
+                {getCartItem(products)}
                 <ListItem className={classes.totalPrice}>
                   <Typography variant="subtitle1">
                     Total :
                     <span className={Type.bold}>
-                      $
+                      Rs
                       {totalPrice}
                     </span>
                   </Typography>
@@ -100,7 +139,14 @@ class Cart extends React.Component {
                   <Divider />
                 </li>
                 <ListItem>
-                  <Button fullWidth className={classes.button} variant="contained" onClick={() => checkout()} color="secondary">
+                  <Button fullWidth className={classes.button} variant="contained" onClick={() =>{
+                    if(!this.props.profile.invoice_no){
+                      this.props.history.push('/app/customer')
+                    }else{
+                      this.props.updateCreateSale("showConfirmModal",true)
+                    }
+                    
+                  }} color="secondary">
                     Checkout
                   </Button>
                 </ListItem>
@@ -127,4 +173,21 @@ Cart.defaultProps = {
   anchorEl: null,
 };
 
-export default withStyles(styles)(Cart);
+const mapStateToProps = state => {
+  return {
+    products : state.get('createSale').products,
+    profile : state.get('customer').profile
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    changeDefaultCombination : (defaultCombination) => dispatch(actions.updateDefaultCombination(defaultCombination)),
+    updateCreateSale : (identifier,value) => dispatch(actions.updateCreateSale(identifier,value)), 
+    addToCart : (product) => dispatch(actions.addProductToSale(product)),
+    updateCart : (index,product) => dispatch(actions.updateCartProduct(index,product)),
+    removeCart : (index) => dispatch(actions.removeProductFromSale(index))
+  }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(withRouter(withStyles(styles)(Cart)));

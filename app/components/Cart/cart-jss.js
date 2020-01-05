@@ -5,6 +5,7 @@ const styles = theme => ({
     display: 'block'
   },
   cartWrap: {
+    
     [theme.breakpoints.up('sm')]: {
       width: 400,
     },

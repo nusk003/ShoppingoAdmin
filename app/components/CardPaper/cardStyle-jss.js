@@ -101,7 +101,7 @@ const styles = theme => ({
     top: -20,
   },
   buttonAddList: {
-    display: 'none',
+    display: 'flex',
     marginLeft: 10
   },
   title: {

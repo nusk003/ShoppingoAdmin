@@ -15,6 +15,7 @@ import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Cart from '../Cart/Cart';
 import styles from './search-jss';
+import {connect} from 'react-redux'
 
 class SearchProduct extends React.Component {
   state = {
@@ -42,20 +43,12 @@ class SearchProduct extends React.Component {
       keyword,
       dataProduct,
       handleSwitchView,
-      listView
+      listView,
+      cartCount
     } = this.props;
 
     const getTotalResult = dataArray => {
-      let totalResult = 0;
-      for (let i = 0; i < dataArray.size; i += 1) {
-        if (dataArray.getIn([i, 'name']) === undefined) {
-          return false;
-        }
-        if (dataArray.getIn([i, 'name']).toLowerCase().indexOf(keyword) !== -1) {
-          totalResult += 1;
-        }
-      }
-      return totalResult;
+      return dataArray.length
     };
 
     return (
@@ -67,7 +60,7 @@ class SearchProduct extends React.Component {
                 <div className={classes.search}>
                   <SearchIcon />
                 </div>
-                <input className={classes.input} placeholder="Search Product" onChange={(event) => search(event)} />
+                <input className={classes.input} placeholder="Search Product" onChange={(event) => search(event.target.value)} />
               </div>
             </div>
             <Typography variant="caption" className={classes.result}>
@@ -93,7 +86,7 @@ class SearchProduct extends React.Component {
                 aria-haspopup="true"
                 onClick={this.handleClick}
               >
-                <Badge badgeContent={totalItems} color="secondary">
+                <Badge badgeContent={cartCount} color="secondary">
                   <ShoppingCartIcon />
                 </Badge>
               </IconButton>
@@ -122,9 +115,15 @@ SearchProduct.propTypes = {
   totalItems: PropTypes.number.isRequired,
   totalPrice: PropTypes.number.isRequired,
   keyword: PropTypes.string.isRequired,
-  dataProduct: PropTypes.object.isRequired,
+  dataProduct: PropTypes.array.isRequired,
   handleSwitchView: PropTypes.func.isRequired,
   listView: PropTypes.string.isRequired,
 };
 
-export default withStyles(styles)(SearchProduct);
+const mapStateToProps = state => {
+  return {
+    cartCount : state.get('createSale').products.length
+  }
+}
+
+export default connect(mapStateToProps)(withStyles(styles)(SearchProduct));

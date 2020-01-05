@@ -17,9 +17,19 @@ import Fab from '@material-ui/core/Fab';
 import Type from 'dan-styles/Typography.scss';
 import Rating from '../Rating/Rating';
 import styles from './cardStyle-jss';
+import { connect } from 'react-redux'
+import AddToCartButton from '../Product/AddToCartButton';
+import * as actions from '../../redux/actions/'
 
 class ProductCard extends React.Component {
+
+  state = {
+    qty : 1,
+    weight : 1
+  }
+
   render() {
+
     const {
       classes,
       discount,
@@ -28,19 +38,50 @@ class ProductCard extends React.Component {
       name,
       desc,
       ratting,
-      price,
+      sellPrice,
       prevPrice,
+      variant,
       list,
       detailOpen,
       addToCart,
       width,
+      cartProducts,
+      activeProduct
     } = this.props;
+    // console.log(activeProduct)
+    const {weight,qty} = this.state
+
+    let cartCount = 0
+    let cartItemIndex = 0
+    let cartItem = {}
+    console.log(cartProducts.length)
+    cartProducts.map((cp,index)=>{
+      
+      if(activeProduct.defaultCombination && cp && activeProduct.defaultCombination.id === cp.product.defaultCombination.id){
+        if(cp.product.weightEnabled){
+          if(weight === cp.weight){
+            cartCount = cp.qty
+            cartItemIndex = index
+            cartItem = cp
+            return
+          }
+        }
+        else{
+          cartCount = cp.qty
+          cartItemIndex = index
+          cartItem = cp
+          return
+        }
+      }
+      
+    })
+
     return (
       <Card className={classNames(classes.cardProduct, isWidthUp('sm', width) && list ? classes.cardList : '')}>
         <div className={classes.status}>
-          {discount !== '' && (
+          {/* {discount !== '' && (
             <Chip label={'Discount ' + discount} className={classes.chipDiscount} />
-          )}
+          )} */}
           {soldout && (
             <Chip label="Sold Out" className={classes.chipSold} />
           )}
@@ -48,51 +89,74 @@ class ProductCard extends React.Component {
         <CardMedia
           className={classes.mediaProduct}
           image={thumbnail}
+          placeholder = {'../../../public/images/product_placeholder.png'}
           title={name}
         />
         <CardContent className={classes.floatingButtonWrap}>
-          {!soldout && (
-            <Tooltip title="Add to cart" placement="top">
-              <Fab onClick={addToCart} size="small" color="secondary" aria-label="add" className={classes.buttonAdd}>
-                <AddShoppingCart />
-              </Fab>
-            </Tooltip>
+          {!soldout && !list && (
+            <AddToCartButton qty = {cartCount} 
+              list = {list}
+              onAddToCart = {()=>this.props.addToCart({product:activeProduct,qty,weight})} 
+              onPlus = {()=>this.props.updateCart(cartItemIndex,{...cartItem,...{qty:parseInt(cartCount) + 1}})}
+              onMinus = {()=>{
+                cartCount===1 ? this.props.removeCart(cartItemIndex)
+                :
+                this.props.updateCart(cartItemIndex,{...cartItem,...{qty : parseInt(cartCount) - 1}})
+              }}
+              onChange = {(qty)=>this.props.updateCart(cartItemIndex,{...cartItem,...{qty}})}
+            />
           )}
-          <Typography noWrap gutterBottom variant="h5" className={classes.title} component="h2">
+          <Typography noWrap gutterBottom className={classes.title} component="h5">
             {name}
           </Typography>
           <Typography component="p" className={classes.desc}>
-            {desc}
+          {!activeProduct.weightEnabled ?
+            variant
+          :
+            ""
+          }
           </Typography>
-          <div className={classes.ratting}>
+          {/* <Typography component="p" className={classes.desc}>
+            {desc}
+          </Typography> */}
+          {/* <div className={classes.ratting}>
             <Rating value={ratting} max={5} readOnly />
-          </div>
+          </div> */}
         </CardContent>
         <CardActions className={classes.price}>
-          <Typography variant="h5">
+          <Typography variant="h7" component = "h5" >
             <span>
-              $
-              {price}
+              Rs.
+              {sellPrice}
             </span>
           </Typography>
-          {prevPrice > 0 && (
+          {/* {prevPrice > 0 && (
             <Typography variant="caption" component="h5">
               <span className={Type.lineThrought}>
                 $
                 {prevPrice}
               </span>
             </Typography>
-          )}
+          )} */}
           <div className={classes.rightAction}>
             <Button size="small" variant="outlined" color="secondary" onClick={detailOpen}>
               See Detail
             </Button>
-            {!soldout && (
-              <Tooltip title="Add to cart" placement="top">
-                <IconButton color="secondary" onClick={addToCart} className={classes.buttonAddList}>
-                  <AddShoppingCart />
-                </IconButton>
-              </Tooltip>
+            {!soldout && list && (
+              <div>
+              <AddToCartButton 
+              list = {list}
+              qty = {cartCount} 
+              onAddToCart = {()=>this.props.addToCart({product:activeProduct,qty,weight})} 
+              onPlus = {()=>this.props.updateCart(cartItemIndex,{...cartItem,...{qty:cartCount + 1}})}
+              onMinus = {()=>{
+                qty===1 ? this.props.removeCart(cartItemIndex)
+                :
+                this.props.updateCart(cartItemIndex,{...cartItem,...{qty : cartCount - 1}})
+              }}
+              onChange = {(qty)=>this.props.updateCart(cartItemIndex,{...cartItem,...{qty}})}
+              />
+              </div>
             )}
           </div>
         </CardActions>
@@ -127,4 +191,20 @@ ProductCard.defaultProps = {
 };
 
 const ProductCardResponsive = withWidth()(ProductCard);
-export default withStyles(styles)(ProductCardResponsive);
+
+const mapStateToProps = state => {
+  return {
+    cartProducts : state.get('createSale').products
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    changeDefaultCombination : (defaultCombination) => dispatch(actions.updateDefaultCombination(defaultCombination)),
+    addToCart : (product) => dispatch(actions.addProductToSale(product)),
+    updateCart : (index,product) => dispatch(actions.updateCartProduct(index,product)),
+    removeCart : (index) => dispatch(actions.removeProductFromSale(index))
+  }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(withStyles(styles)(ProductCardResponsive));

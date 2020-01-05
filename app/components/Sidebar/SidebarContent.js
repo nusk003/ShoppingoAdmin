@@ -10,6 +10,7 @@ import Avatar from '@material-ui/core/Avatar';
 import brand from 'dan-api/dummy/brand';
 import dummy from 'dan-api/dummy/dummyContents';
 import logo from 'dan-images/logo.svg';
+import logo_shoppingo from '../../../public/images/logo_high.png'
 import MainMenu from './MainMenu';
 import styles from './sidebar-jss';
 
@@ -69,9 +70,9 @@ class SidebarContent extends React.Component {
     return (
       <div className={classNames(classes.drawerInner, !drawerPaper ? classes.drawerPaperClose : '')}>
         <div className={classes.drawerHeader}>
-          <NavLink to="/app" className={classNames(classes.brand, classes.brandBar, turnDarker && classes.darker)}>
-            <img src={logo} alt={brand.name} />
-            {brand.name}
+          <NavLink to="/app"  className={classNames(classes.brand, classes.brandBar, turnDarker && classes.darker)}>
+            <img src={logo_shoppingo} width = "100%" alt={brand.name} />
+            {/* {brand.name} */}
           </NavLink>
           {isLogin && (
             <div

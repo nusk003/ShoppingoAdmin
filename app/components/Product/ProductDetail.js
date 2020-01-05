@@ -21,8 +21,10 @@ import 'dan-styles/vendors/slick-carousel/slick.css';
 import 'dan-styles/vendors/slick-carousel/slick-theme.css';
 import Rating from '../Rating/Rating';
 import styles from './product-jss';
-
-const getThumb = imgData.map(a => a.thumb);
+import { Select, MenuItem, FormControl, InputLabel, Input, Fab, Icon } from '@material-ui/core';
+import * as actions from '../../redux/actions/index'
+import {connect} from 'react-redux'
+import AddToCartButton from './AddToCartButton';
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
@@ -31,7 +33,9 @@ function Transition(props) {
 class ProductDetail extends React.Component {
   state = {
     qty: 1,
+    weight : 1
   }
+  
 
   handleQtyChange = event => {
     this.setState({ qty: event.target.value });
@@ -43,25 +47,27 @@ class ProductDetail extends React.Component {
     close();
   }
 
+ 
+
   render() {
     const {
       classes,
       open,
       close,
       detailContent,
-      productIndex
+      productIndex,
+      activeProduct,
+      cartProducts
     } = this.props;
 
-    const { qty } = this.state;
+    const { qty,weight } = this.state;
 
     const itemAttr = (item) => {
       if (item !== undefined) {
         return {
-          id: detailContent.getIn([productIndex, 'id']),
-          name: detailContent.getIn([productIndex, 'name']),
-          thumbnail: detailContent.getIn([productIndex, 'thumbnail']),
-          price: detailContent.getIn([productIndex, 'price']),
-          quantity: qty
+          product : item,
+          qty,
+          weight
         };
       }
       return false;
@@ -79,7 +85,42 @@ class ProductDetail extends React.Component {
       slidesToScroll: 1,
     };
 
+    let getThumb = []
+
+    if (activeProduct.images){
+      getThumb = activeProduct.images.map(a => a);
+    }
+
+    let cartCount = 0
+    let cartItemIndex = 0
+    let cartItem = {}
+
+    console.log(cartProducts)
+
+    cartProducts.map((cp,index)=>{
+
+      if(activeProduct.defaultCombination && cp && activeProduct.defaultCombination.id == cp.product.defaultCombination.id){
+        if(cp.product.weightEnabled){
+          if(weight === cp.weight){
+            cartCount = cp.qty
+            cartItemIndex = index
+            cartItem = {...cp,...{}}
+            return
+          }
+        }
+        else{
+          // alert(activeProduct.defaultCombination.id)
+          cartCount = cp.qty
+          cartItemIndex = index
+          cartItem = {...cp,...{}}
+          return
+        }
+      }
+      
+    })
+    // alert(activeProduct.defaultCombination.id)
     return (
+      activeProduct ?
       <Dialog
         fullScreen
         open={open}
@@ -89,96 +130,133 @@ class ProductDetail extends React.Component {
         <AppBar className={classes.appBar}>
           <Toolbar>
             <Typography variant="h6" noWrap color="inherit" className={classes.flex}>
-              {detailContent.getIn([productIndex, 'name'])}
+              {activeProduct.title}
             </Typography>
             <IconButton color="inherit" onClick={() => close()} aria-label="Close">
               <CloseIcon />
             </IconButton>
           </Toolbar>
         </AppBar>
+        {open &&
         <div className={classes.detailContainer}>
-          <Grid container className={classes.root} spacing={24}>
-            <Grid item md={5} sm={12} xs={12}>
-              <div className="container thumb-nav">
-                <Slider {...settings}>
-                  {imgData.map((item, index) => {
-                    if (index >= 5) {
-                      return false;
-                    }
-                    return (
-                      <div key={index.toString()} className={classes.item}>
-                        <img src={item.img} alt={item.title} />
-                      </div>
-                    );
-                  })}
-                </Slider>
-              </div>
-            </Grid>
-            <Grid item md={7} sm={12} xs={12}>
-              <section className={classes.detailWrap}>
-                <Typography noWrap gutterBottom variant="h5" className={classes.title} component="h2">
-                  {detailContent.getIn([productIndex, 'name'])}
-                </Typography>
-                <div className={classes.price}>
-                  <Typography variant="h5">
-                    <span>
-                      $
-                      {detailContent.getIn([productIndex, 'price'])}
-                    </span>
-                  </Typography>
-                  {detailContent.getIn([productIndex, 'discount']) !== '' && (
-                    <Fragment>
-                      <Typography variant="caption" component="h5">
-                        <span className={Type.lineThrought}>
-                          $
-                          {detailContent.getIn([productIndex, 'prevPrice'])}
-                        </span>
-                      </Typography>
-                      <Chip label={'Discount ' + detailContent.getIn([productIndex, 'discount'])} className={classes.chipDiscount} />
-                    </Fragment>
-                  )}
-                  {detailContent.getIn([productIndex, 'soldout']) && (
-                    <Chip label="Sold Out" className={classes.chipSold} />
-                  )}
-                </div>
-                <div className={classes.ratting}>
-                  <Rating value={detailContent.getIn([productIndex, 'ratting'])} max={5} readOnly />
-                </div>
-                <Typography component="p" className={classes.desc}>
-                  {detailContent.getIn([productIndex, 'desc'])}
-                </Typography>
-                {!detailContent.getIn([productIndex, 'soldout']) && (
-                  <div className={classes.btnArea}>
-                    <Typography variant="subtitle1">
-                      Quantity :
-                    </Typography>
-                    <TextField
-                      type="number"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      InputProps={{ inputProps: { min: 0 } }}
-                      margin="none"
-                      value={qty}
-                      className={classes.quantity}
-                      onChange={this.handleQtyChange}
-                    />
-                    <Button
-                      variant="contained"
-                      onClick={() => this.submitToCart(itemAttr(detailContent))}
-                      color="secondary"
-                      disabled={qty < 1}
-                    >
-                      <AddShoppingCart />
-                      &nbsp;Add to cart
-                    </Button>
-                  </div>
-                )}
-              </section>
-            </Grid>
+        <Grid container className={classes.root} spacing={24}>
+          <Grid item md={5} sm={12} xs={12}>
+            <div className="container thumb-nav">
+              <Slider {...settings}>
+                {activeProduct.images && activeProduct.images.map((item, index) => {
+                  if (index >= 5) {
+                    return false;
+                  }
+                  return (
+                    <div key={index.toString()} className={classes.item}>
+                      <img src={item}  />
+                    </div>
+                  );
+                })}
+              </Slider>
+            </div>
           </Grid>
-        </div>
+          <Grid item md={7} sm={12} xs={12}>
+            <section className={classes.detailWrap}>
+              <Typography noWrap gutterBottom variant="h5" className={classes.title} component="h2">
+                {activeProduct.title}
+              </Typography>
+              <div className={classes.price}>
+                <Typography variant="h5">
+                  <span>
+                    Rs.
+                    {activeProduct.defaultCombination ? activeProduct.defaultCombination.sellPrice : 0}
+                  </span>
+                </Typography>
+                {/* {detailContent.getIn([productIndex, 'discount']) !== '' && (
+                  <Fragment>
+                    <Typography variant="caption" component="h5">
+                      <span className={Type.lineThrought}>
+                        $
+                        {detailContent.getIn([productIndex, 'prevPrice'])}
+                      </span>
+                    </Typography>
+                    <Chip label={'Discount ' + detailContent.getIn([productIndex, 'discount'])} className={classes.chipDiscount} />
+                  </Fragment>
+                )} */}
+                {activeProduct.defaultCombination && !activeProduct.defaultCombination.isStock && (
+                  <Chip label="Sold Out" className={classes.chipSold} />
+                )}
+              </div>
+              {/* <div className={classes.ratting}>
+                <Rating value={detailContent.getIn([productIndex, 'ratting'])} max={5} readOnly />
+              </div> */}
+              {/* <Typography component="p" className={classes.desc}>
+                {detailContent.getIn([productIndex, 'desc'])}
+              </Typography> */}
+              {activeProduct.weightEnabled &&
+                <FormControl>
+                <Typography>Weight</Typography>
+                <Input
+                    id = "weight-input"
+                    placeholder = "Weight"
+                    title = "Weight"
+                    type="number"
+                    
+                    InputProps={{ inputProps: { min: 0 } }}
+                    margin="none"
+                    step = "0.01"
+                    defaultValue={qty}
+                    className={classes.quantity}
+                    onChange={(e)=>this.setState({weight : e.target.value})}
+                  />
+                  </FormControl>
+              }
+
+              {activeProduct.combinations &&
+                activeProduct.combinations.length > 1 ?
+                <Select
+                  onChange = {(e)=>
+                    this.props.changeDefaultCombination({...e.target.value,...{}})
+                  }
+                  value = {activeProduct.defaultCombination}
+                  renderValue = {({value})=>`${value}`}
+
+                >
+                {activeProduct.combinations.map((combination,index)=>
+                  <MenuItem  key = {index}  value = {combination}  >{combination.value}</MenuItem>
+                )}
+                </Select>
+
+                :
+
+                <Typography>
+                  {activeProduct.defaultCombination && activeProduct.defaultCombination.value}
+                </Typography>
+
+              }
+              
+              {activeProduct.defaultCombination && activeProduct.defaultCombination.isStock && (
+                <div className={classes.btnArea}>
+                
+                  <AddToCartButton qty = {cartCount} 
+                    list = {true}
+                    onAddToCart = {()=>this.props.addToCart({product:{...activeProduct},qty,weight})} 
+                    onPlus = {()=>this.props.updateCart(cartItemIndex,{...cartItem,...{qty:parseInt(cartCount) + 1}})}
+                    onMinus = {()=>{
+                      cartCount===1 ? this.props.removeCart(cartItemIndex)
+                      :
+                      this.props.updateCart(cartItemIndex,{...cartItem,...{qty : parseInt(cartCount) - 1}})
+                    }}
+                    onChange = {(qty)=>this.props.updateCart(cartItemIndex,{...cartItem,...{qty}})}
+                  />
+
+                </div>
+              )}
+            </section>
+          </Grid>
+        </Grid>
+      </div>
+        }
+        
       </Dialog>
+      :
+      null
     );
   }
 }
@@ -188,12 +266,29 @@ ProductDetail.propTypes = {
   open: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   handleAddToCart: PropTypes.func.isRequired,
-  detailContent: PropTypes.object.isRequired,
+  detailContent: PropTypes.array.isRequired,
   productIndex: PropTypes.number,
+  activeProduct : PropTypes.object.isRequired
 };
 
 ProductDetail.defaultProps = {
-  productIndex: undefined
+  productIndex: 1
 };
 
-export default withStyles(styles)(ProductDetail);
+const mapStateToProps = state => {
+  return {
+    cartProducts : state.get('createSale').products,
+    activeProduct : state.get('getProducts').activeProduct
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    changeDefaultCombination : (defaultCombination) => dispatch(actions.updateDefaultCombination(defaultCombination)),
+    addToCart : (product) => dispatch(actions.addProductToSale(product)),
+    updateCart : (index,product) => dispatch(actions.updateCartProduct(index,product)),
+    removeCart : (index) => dispatch(actions.removeProductFromSale(index))
+  }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(withStyles(styles)(ProductDetail));

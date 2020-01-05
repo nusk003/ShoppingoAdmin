@@ -21,6 +21,9 @@ import chat from './modules/chat';
 import email from './modules/email';
 import calendar from './modules/calendar';
 import taskboard from './modules/taskboard';
+import customer from './modules/customer'
+import createSale from './modules/createSale'
+import getProducts from './modules/getProducts'
 
 /**
  * Branching reducers to use one reducer for many components
@@ -53,6 +56,9 @@ export default function createReducer(injectedReducers = {}) {
     chat,
     email,
     taskboard,
+    customer,
+    createSale,
+    getProducts,
     treeTableArrow: branchReducer(treeTable, 'treeTableArrow'),
     treeTablePM: branchReducer(treeTable, 'treeTablePM'),
     crudTableDemo: branchReducer(crudTable, 'crudTableDemo'),

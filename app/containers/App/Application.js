@@ -32,6 +32,9 @@ import {
   HelpSupport, MapMarker, MapDirection, SearchMap,
   TrafficIndicator, StreetViewMap, NotFound,ViewProducts
 } from '../pageListAsync';
+import SelectCustomer from '../CreateOrder.js/SelectCustomer';
+import CustomerProfile from '../CreateOrder.js/CustomerProfile';
+import SalesProductsMapped from '../CreateOrder.js/SaleProducts';
 
 class Application extends React.Component {
   render() {
@@ -145,6 +148,10 @@ class Application extends React.Component {
           <Route path="/app/maps/map-searchbox" component={SearchMap} />
           <Route path="/app/maps/map-traffic" component={TrafficIndicator} />
           <Route path="/app/maps/street-view" component={StreetViewMap} />
+
+          <Route path="/app/customer/" component={SelectCustomer} />
+          <Route path="/app/customer-profile/" component={CustomerProfile} />
+          <Route path="/app/add-products/" component={SalesProductsMapped} />
           { /* Default */ }
           <Route component={NotFound} />
         </Switch>

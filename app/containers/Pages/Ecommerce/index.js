@@ -51,6 +51,9 @@ class Ecommerce extends React.Component {
       closeNotif,
       messageNotif
     } = this.props;
+
+    console.log(dataProduct.size)
+
     return (
       <div>
         <Helmet>

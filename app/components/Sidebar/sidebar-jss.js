@@ -233,8 +233,9 @@ const styles = theme => ({
     fontWeight: 500,
     color: theme.palette.text.primary,
     '& img': {
-      width: 30,
+      width: 90,
       marginRight: 10,
+      marginBottom : 10
     },
   },
   brandBig: {
