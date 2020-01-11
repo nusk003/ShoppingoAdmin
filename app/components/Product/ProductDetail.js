@@ -21,7 +21,7 @@ import 'dan-styles/vendors/slick-carousel/slick.css';
 import 'dan-styles/vendors/slick-carousel/slick-theme.css';
 import Rating from '../Rating/Rating';
 import styles from './product-jss';
-import { Select, MenuItem, FormControl, InputLabel, Input, Fab, Icon } from '@material-ui/core';
+import { Select, MenuItem, FormControl, InputLabel, Input, Fab, Icon, FormHelperText, InputAdornment } from '@material-ui/core';
 import * as actions from '../../redux/actions/index'
 import {connect} from 'react-redux'
 import AddToCartButton from './AddToCartButton';
@@ -197,12 +197,11 @@ class ProductDetail extends React.Component {
                     placeholder = "Weight"
                     title = "Weight"
                     type="number"
-                    
-                    InputProps={{ inputProps: { min: 0 } }}
                     margin="none"
-                    step = "0.01"
-                    defaultValue={qty}
-                    className={classes.quantity}
+                    value={weight}
+                    inputProps = {{min : 0.01}}
+                    // className={classes.quantity}
+                    endAdornment = {<InputAdornment style = {{display : 'flex',width : '100%',justifyContent : 'center',alignItems : 'center'}}  >{activeProduct.defaultCombination.value}</InputAdornment>}
                     onChange={(e)=>this.setState({weight : e.target.value})}
                   />
                   </FormControl>
@@ -229,6 +228,9 @@ class ProductDetail extends React.Component {
                   {activeProduct.defaultCombination && activeProduct.defaultCombination.value}
                 </Typography>
 
+              }
+              {activeProduct.defaultCombination &&
+                <FormHelperText>Approx Rs.{(parseFloat(activeProduct.defaultCombination.sellPrice) * weight * (cartCount === 0 ? 1 : cartCount)).toFixed(2)}</FormHelperText>
               }
               
               {activeProduct.defaultCombination && activeProduct.defaultCombination.isStock && (

@@ -30,10 +30,11 @@ export const setActiveProduct = activeProduct => {
     }
 }
 
-export const updateDefaultCombination = defaultCombination => {
+export const updateDefaultCombination = (defaultCombination,id) => {
     return {
         type : actionTypes.UPDATE_DEFAULT_COMBINATION,
-        defaultCombination
+        defaultCombination,
+        id
     }
 }
 

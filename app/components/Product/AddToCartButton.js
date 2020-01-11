@@ -25,7 +25,7 @@ class AddToCartButton extends React.Component {
                       }}
                       onChange = {(e)=>{
                         if(e.target.value > 0) {
-                            onChange(e.target.value)
+                            onChange(Math.floor(e.target.value))
                         }
                       }}
                       style = {{textAlign : 'center',width : 75,marginRight : '1vw',marginLeft : '1vw'}}

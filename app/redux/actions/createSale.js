@@ -64,7 +64,7 @@ export const createSale =  () => {
     return (dispatch,getState) => {
         dispatch(createSaleStart())
         const {user_id} = getState().get('customer').profile
-        const {address,products,invoice_no,sms} = getState().get('createSale')
+        const {address,products,invoice_no,sms,delivery_charge} = getState().get('createSale')
 
         let items = []
 
@@ -85,7 +85,8 @@ export const createSale =  () => {
             user_id,
             address,
             sms,
-            items
+            items,
+            delivery_charge
         }))
 
         Axios.post(`https://shoppingo.lk/api/orders/create_order_for_admin.php`,formData)

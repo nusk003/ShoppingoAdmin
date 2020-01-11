@@ -8,7 +8,8 @@ const initialState = {
     invoice_no : null,
     sms : true,
     showConfirmModal : false,
-    notification : ""
+    notification : "",
+    delivery_charge : 50.00
 }
 
 const updateCreateSale = (state = initialState,{identifier,value}) => {

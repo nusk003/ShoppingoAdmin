@@ -16,11 +16,11 @@ class SelectCustomer extends React.Component {
     const title = "Find Customer";
     const description = "You can find the customer here";
 
-    const {customer,getCustomer} = this.props
+    const {customer,getCustomer,closeAddCustomerModal} = this.props
     return (
       <div>
         
-        <Modal style = {{display : 'flex',flex:1,justifyContent:'center',alignItems : 'center'}}  open = {customer.showAddCustomerModal} >
+        <Modal onClose = {closeAddCustomerModal} style = {{display : 'flex',flex:1,justifyContent:'center',alignItems : 'center'}}  open = {customer.showAddCustomerModal} >
           <div style = {{width : '100%'}} >
           <AddCustomer onSubmit = {this.props.createCustomer} />
           </div>
@@ -75,7 +75,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     getCustomer : phone => dispatch(actions.getCustomer(phone)),
-    createCustomer : customer => dispatch(actions.createCustomer(customer))
+    createCustomer : customer => dispatch(actions.createCustomer(customer)),
+    closeAddCustomerModal : () => dispatch(actions.closeAddCustomerModal())
   }
 }
 

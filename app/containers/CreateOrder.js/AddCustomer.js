@@ -22,6 +22,7 @@ import {
   Switch
 } from 'redux-form-material-ui';
 import { initAction, clearAction } from '../../actions/ReduxFormActions';
+import * as actions from '../../redux/actions/index'
 
 const renderRadioGroup = ({ input, ...rest }) => (
   <RadioGroup
@@ -96,7 +97,8 @@ class AddCustomer extends Component {
       reset,
       submitting,
       init,
-      clear
+      clear,
+      closeAddCustomerModal
     } = this.props;
     return (
       <div>
@@ -205,6 +207,13 @@ class AddCustomer extends Component {
                   >
                     Reset
                   </Button>
+                  <Button
+                    type="button"
+                    color = "inherit"
+                    onClick={closeAddCustomerModal}
+                  >
+                    Close
+                  </Button>
                 </div>
               </form>
             </Paper>
@@ -232,6 +241,7 @@ AddCustomer.propTypes = {
 const mapDispatchToProps = dispatch => ({
   init: bindActionCreators(initAction, dispatch),
   clear: () => dispatch(clearAction),
+  closeAddCustomerModal : () => dispatch(actions.closeAddCustomerModal())
 });
 
 const ReduxFormMapped = reduxForm({

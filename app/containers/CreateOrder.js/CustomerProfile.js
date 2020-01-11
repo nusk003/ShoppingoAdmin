@@ -76,12 +76,12 @@ class CustomerProfile extends React.Component {
     const title = brand.name + ' - Profile';
     const description = brand.desc;
     const { profile, phone } = this.props.customer;
-    const { customer } = this.props;
+    const { customer,closeAddAddressModal } = this.props;
     const { value } = this.state;
     console.log(customer)
     return (
       <div>
-        <Modal style = {{display : 'flex',flex:1,justifyContent:'center',alignItems : 'center'}}  open = {customer.showAddAddressModal} >
+        <Modal onClose = {closeAddAddressModal} style = {{display : 'flex',flex:1,justifyContent:'center',alignItems : 'center'}}  open = {customer.showAddAddressModal} >
           <div style = {{width : '100%'}} >
           <AddAddress onSubmit = {this.props.addAddress} />
           </div>
@@ -196,7 +196,8 @@ const constDispatchToProps = dispatch => ({
   fetchData: bindActionCreators(fetchAction, dispatch),
   updateCreateSale : (identifier,value) => dispatch(actions.updateCreateSale(identifier,value)),
   addAddress : (address) => dispatch(actions.addAddress(address)),
-  showAddAddressModal : () => dispatch(actions.showAddAddressModal())
+  showAddAddressModal : () => dispatch(actions.showAddAddressModal()),
+  closeAddAddressModal : () => dispatch(actions.closeAddAddressModal())
 });
 
 const UserProfileMapped = connect(

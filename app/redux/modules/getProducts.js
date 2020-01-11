@@ -36,9 +36,23 @@ const setActiveProduct = (state=initialState,{activeProduct}) => {
     }
 }
 
-const updateDefaultCombination = (state = initialState,{defaultCombination}) => {
+const updateDefaultCombination = (state = initialState,{defaultCombination,id}) => {
 
     const newState = {...state,...{}}
+    if (id) {
+        const products = newState.products
+        const index = products.findIndex(product => product.id === id)
+
+        if (index > -1){
+            products[index].defaultCombination = defaultCombination
+        }
+
+        newState.products = products
+
+        return {
+            ...state,...newState
+        }
+    }
     newState.activeProduct.defaultCombination = defaultCombination
 
     return {

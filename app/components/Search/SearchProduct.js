@@ -52,10 +52,10 @@ class SearchProduct extends React.Component {
     };
 
     return (
-      <div className={classes.root}>
-        <AppBar position="static" color="inherit">
+      <div  className={classes.root}>
+        <AppBar position="sticky"  color="inherit">
           <Toolbar>
-            <div className={classes.flex}>
+            <div className={classes.flex} >
               <div className={classes.wrapper}>
                 <div className={classes.search}>
                   <SearchIcon />

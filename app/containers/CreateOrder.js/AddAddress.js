@@ -105,7 +105,8 @@ class AddAddress extends Component {
       reset,
       submitting,
       init,
-      clear
+      clear,
+      closeModal
     } = this.props;
     return (
       <div>
@@ -213,6 +214,12 @@ class AddAddress extends Component {
                     onClick={reset}
                   >
                     Reset
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={closeModal}
+                  >
+                    Close
                   </Button>
                 </div>
               </form>

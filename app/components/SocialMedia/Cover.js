@@ -46,7 +46,7 @@ class Cover extends React.Component {
     const { anchorElOpt } = this.state;
     return (
       <div className={classes.cover} style={{ backgroundImage: `url(${coverImg})` }}>
-        <div className={classes.opt}>
+        {/* <div className={classes.opt}>
           <IconButton className={classes.button} aria-label="Delete">
             <Info />
           </IconButton>
@@ -77,7 +77,7 @@ class Cover extends React.Component {
               </MenuItem>
             ))}
           </Menu>
-        </div>
+        </div> */}
         <div className={classes.content}>
           <Avatar alt={name} src={avatar} className={classes.avatar} />
           <Typography variant="h4" className={classes.name} gutterBottom>
@@ -87,9 +87,9 @@ class Cover extends React.Component {
           <Typography className={classes.subheading} gutterBottom>
             {desc}
           </Typography>
-          <Button className={classes.button} size="large" variant="contained" color="secondary">
+          {/* <Button className={classes.button} size="large" variant="contained" color="secondary">
             Add to Connection
-          </Button>
+          </Button> */}
         </div>
       </div>
     );

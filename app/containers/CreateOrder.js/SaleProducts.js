@@ -97,6 +97,17 @@ class SaleProducts extends React.Component {
                 onChange = {(e)=>this.props.updateCreateSale("invoice_no",e.target.value)}
                 fullWidth
               />
+            <TextField
+                required
+                autoFocus
+                margin="dense"
+                id="delivery_charge"
+                label="Delivery Charge"
+                type="number"
+                value = {createSale.delivery_charge}
+                onChange = {(e)=>this.props.updateCreateSale("delivery_charge",e.target.value)}
+                fullWidth
+              />
             <FormControlLabel
                 control={(
                   <Switch
@@ -136,7 +147,7 @@ class SaleProducts extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <Notification close={() => closeNotif()} message={createSale.notification} />
-        
+        <div style = {{position:'relative',top : 0}} >
         <SearchProduct
           dataCart={dataCart}
           dataProduct={dataProduct}
@@ -158,6 +169,7 @@ class SaleProducts extends React.Component {
           productIndex={productIndex}
           keyword={keyword}
         />
+        </div>
       </div>
     );
   }
