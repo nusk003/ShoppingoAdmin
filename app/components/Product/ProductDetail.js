@@ -215,10 +215,11 @@ class ProductDetail extends React.Component {
                   }
                   value = {activeProduct.defaultCombination}
                   renderValue = {({value})=>`${value}`}
+                  style = {{color : activeProduct.defaultCombination && !activeProduct.defaultCombination.isStock && 'red'}}
 
                 >
                 {activeProduct.combinations.map((combination,index)=>
-                  <MenuItem  key = {index}  value = {combination}  >{combination.value}</MenuItem>
+                  <MenuItem style = {{color :!combination.isStock && 'red'}} key = {index}  value = {combination}  >{combination.value}</MenuItem>
                 )}
                 </Select>
 

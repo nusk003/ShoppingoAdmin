@@ -121,10 +121,10 @@ class ProductCard extends React.Component {
                 }
                 value = {activeProduct.defaultCombination}
                 renderValue = {({value})=>`${value}`}
-
+                style = {{color : activeProduct.defaultCombination && !activeProduct.defaultCombination.isStock && 'red'}}
               >
               {activeProduct.combinations.map((combination,index)=>
-                <MenuItem  key = {index}  value = {combination}  >{combination.value}</MenuItem>
+                <MenuItem style = {{color :!combination.isStock && 'red'}} key = {index}  value = {combination}  >{combination.value}</MenuItem>
               )}
               </Select>
 
@@ -142,7 +142,7 @@ class ProductCard extends React.Component {
                 onChange = {(e)=>e.target.value > 0 && this.setState({weight : e.target.value})}
                 InputProps = {
                   {endAdornment : <InputAdornment style = {{display : 'flex',width : '100%',justifyContent : 'center',alignItems : 'center'}} >
-                  {activeProduct.defaultCombination.value}
+                  {activeProduct.defaultCombination && activeProduct.defaultCombination.value}
               </InputAdornment>}}
               FormHelperTextProps = {{
                 style : {
