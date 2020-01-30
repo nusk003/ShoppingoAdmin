@@ -154,8 +154,13 @@ class ProductCard extends React.Component {
          
           }
           {activeProduct.defaultCombination &&
+          <div>
              <FormHelperText >Approx Rs.{(parseFloat(activeProduct.defaultCombination.sellPrice) * weight * (cartCount === 0 ? 1 : cartCount)).toFixed(2)}</FormHelperText>          
+             <FormHelperText style = {{color : '#6a0dad'}} >{activeProduct.defaultCombination.seller}</FormHelperText> 
+          </div>
           }
+                   
+
           </div>
           {/* <Typography component="p" className={classes.desc}>
             {desc}

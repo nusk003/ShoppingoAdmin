@@ -18,12 +18,17 @@ import styles from './cart-jss';
 import {connect} from 'react-redux'
 import * as actions from '../../redux/actions'
 import AddToCartButton from '../Product/AddToCartButton';
-import { Modal } from '@material-ui/core';
+import { Modal, Dialog, Input, DialogTitle, DialogContent, FormControl, DialogActions } from '@material-ui/core';
 import {withRouter} from 'react-router-dom'
 
 class Cart extends React.Component {
 
-  
+  state = {
+    showUpdateModal : false,
+    cartItem : {},
+    cartItemIndex : -1
+  }
+
   render() {
     const {
       classes,
@@ -48,7 +53,7 @@ class Cart extends React.Component {
       const {product,qty,weight} = cartItem
       return(
       <Fragment key={index.toString()}>
-        <ListItem>
+        <ListItem onClick = {()=>this.setState({showUpdateModal : true,cartItem:{...cartItem,...{}},cartItemIndex:index})} >
           <figure style = {{width : 50,height : 50}} >
             <img src={product.images[0]} alt="thumb" />
           </figure>
@@ -103,6 +108,44 @@ class Cart extends React.Component {
         onClose={close}
         className={classes.cartPanel}
       >
+      <Dialog open = {this.state.showUpdateModal} >
+        <DialogTitle>
+          Update Cart
+        </DialogTitle>
+        <form onSubmit = {
+          (e) => {
+            e.preventDefault()
+            this.props.updateCart(this.state.cartItemIndex,this.state.cartItem)
+          } 
+        } >
+        <DialogContent>
+          {this.state.cartItem.product && this.state.cartItem.product.weightEnabled &&
+           <FormControl>
+            <Input type = "number" value = {this.state.cartItem.weight} placeholder = "Weight" required />
+          </FormControl>
+          }
+          <FormControl>
+            <Input onChange = {
+              (e) => {
+                const cartItem = this.state.cartItem
+                const product = {...this.state.cartItem.product}
+                product.defaultCombination.sellPrice = e.target.value
+                const newCartItem = {...cartItem,...{product}}
+                this.setState({cartItem:newCartItem})
+              }
+            } type = "number" value = {this.state.cartItem.product && this.state.cartItem.product.defaultCombination.sellPrice} placeholder = "Price" required />
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button type = "submit" color = "secondary" variant = "contained" >
+            Update
+          </Button>
+          <Button onClick = {()=>this.setState({showUpdateModal : false})} color = "secondary" >
+            Cancel
+          </Button>
+        </DialogActions>
+        </form>
+      </Dialog>
 
         <List
           component="ul"
