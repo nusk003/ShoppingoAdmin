@@ -96,7 +96,7 @@ class ProductCard extends React.Component {
           title={name}
         />
         <CardContent  className={classes.floatingButtonWrap}>
-          {!soldout && !list && (
+          {!list && weight && weight > 0 && (
             <AddToCartButton qty = {cartCount} 
               list = {list}
               onAddToCart = {()=>this.props.addToCart({product:{...activeProduct},qty,weight})} 
@@ -109,7 +109,7 @@ class ProductCard extends React.Component {
               onChange = {(qty)=>this.props.updateCart(cartItemIndex,{...cartItem,...{qty}})}
             />
           )}
-          <Typography onClick={detailOpen} noWrap  gutterBottom className={classes.title} component="p">
+          <Typography onClick={detailOpen} style = {{color : soldout ? 'red' : 'black'}} noWrap  gutterBottom className={classes.title} component="p">
             {name}
           </Typography>
           <div >
@@ -139,11 +139,14 @@ class ProductCard extends React.Component {
             <TextField
                 type = "number"
                 value = {weight}
-                onChange = {(e)=>e.target.value > 0 && this.setState({weight : e.target.value})}
+                onChange = {(e)=>this.setState({weight : e.target.value})}
                 InputProps = {
                   {endAdornment : <InputAdornment style = {{display : 'flex',width : '100%',justifyContent : 'center',alignItems : 'center'}} >
                   {activeProduct.defaultCombination && activeProduct.defaultCombination.value}
-              </InputAdornment>}}
+              </InputAdornment>,
+              min : 0.01
+
+              }}
               FormHelperTextProps = {{
                 style : {
                   marginBottom : 20
@@ -193,7 +196,7 @@ class ProductCard extends React.Component {
             <Button size="small" variant="outlined" color="secondary" onClick={detailOpen}>
               See Detail
             </Button>
-            {!soldout && list && (
+            {!soldout && weight && weight > 0 && list && (
               <div>
               <AddToCartButton 
               list = {list}

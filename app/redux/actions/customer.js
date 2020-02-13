@@ -10,10 +10,11 @@ export const getCustomerStart = () => {
     }
 }
 
-export const getCustomerSuccess = (customer) => {
+export const getCustomerSuccess = (customer,phone) => {
     return {
         type : actionTypes.GET_CUSTOMER_SUCCESS,
-        customer
+        customer,
+        phone
     }
 }
 
@@ -55,10 +56,11 @@ export const createCustomerStart = () => {
     }
 }
 
-export const createCustomerSuccess = profile => {
+export const createCustomerSuccess = (profile,phone) => {
     return {
         type : actionTypes.CREATE_CUSTOMER_SUCCESS,
-        profile
+        profile,
+        phone
     }
 }
 
@@ -101,7 +103,7 @@ export const getCustomer = (phone) => {
             if(data.profile !== null){
                 // alert(1)
                 await history
-                dispatch(getCustomerSuccess(data.profile))
+                dispatch(getCustomerSuccess(data.profile,phone))
                 dispatch(actions.updateCreateSale("invoice_no",data.profile.invoice_no))
                 history.push('/app/customer-profile')
             }
@@ -133,7 +135,7 @@ export const createCustomer = (customer) => {
         .then( async ({data})=>{
             if(data.success) {
                 await history
-                dispatch(createCustomerSuccess(data.profile))
+                dispatch(createCustomerSuccess(data.profile,customer.get('phone')))
                 dispatch(closeAddCustomerModal())
                 dispatch(actions.updateCreateSale("invoice_no",data.profile.invoice_no))
                 history.push('/app/customer-profile')

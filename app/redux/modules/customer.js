@@ -47,8 +47,8 @@ const closeAddAddressModal = (state=initialState) => {
     }
 }
 
-const getCustomerSuccess = (state = initialState,{customer}) => {
-    return {...state, ...{profile : customer,loading :  false}}
+const getCustomerSuccess = (state = initialState,{customer,phone}) => {
+    return {...state, ...{profile : customer,loading :  false,phone}}
 }
 
 const getCustomerFail = (state = initialState,{error}) => {
@@ -69,9 +69,9 @@ const createCustomerStart = (state=initialState) => {
     }
 }
 
-const createCustomerSuccess = (state=initialState,{profile}) => {
+const createCustomerSuccess = (state=initialState,{profile,phone}) => {
     return {
-        ...state,...{loading : false,profile}
+        ...state,...{loading : false,profile,phone}
     }
 }
 

@@ -16,7 +16,7 @@ import {
   searchAction,
   closeNotifAction
 } from 'dan-actions/EcommerceActions';
-import { Modal, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button, Switch, FormControlLabel, Typography, CircularProgress } from '@material-ui/core';
+import { Modal, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button, Switch, FormControlLabel, Typography, CircularProgress, Card, CardHeader, CardContent } from '@material-ui/core';
 import Ionicon from 'react-ionicons';
  
 class SaleProducts extends React.Component {
@@ -147,7 +147,15 @@ class SaleProducts extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <Notification close={() => closeNotif()} message={createSale.notification} />
-        <div style = {{position:'relative',top : 0}} >
+        <div style = {{position:'fixed',top : '15vh',zIndex : 100000,width : '75%'}} >
+        <Card>
+          <CardHeader title = "Customer Profile" />
+          <CardContent>
+            <Typography>{`${this.props.customer.profile.f_name} ${this.props.customer.profile.l_name}`}</Typography>
+            <Typography>{`${this.props.customer.phone}`}</Typography>
+            <Typography>{`${this.props.createSale.address}`}</Typography>
+          </CardContent>
+        </Card>
         <SearchProduct
           dataCart={dataCart}
           dataProduct={dataProduct}
@@ -160,15 +168,17 @@ class SaleProducts extends React.Component {
           listView={listView}
           handleSwitchView={this.handleSwitchView}
         />
-        <ProductGallery
-          activeProduct = {activeProduct}
-          listView={listView}
-          dataProduct={dataProduct}
-          showDetail={showDetail}
-          handleAddToCart={handleAddToCart}
-          productIndex={productIndex}
-          keyword={keyword}
-        />
+        </div>
+        <div style = {{position : 'relative',top:'30vh'}} >
+          <ProductGallery
+            activeProduct = {activeProduct}
+            listView={listView}
+            dataProduct={dataProduct}
+            showDetail={showDetail}
+            handleAddToCart={handleAddToCart}
+            productIndex={productIndex}
+            keyword={keyword}
+          />
         </div>
       </div>
     );
@@ -205,6 +215,7 @@ const mapStateToProps = state => ({
   totalItems: state.getIn([reducer, 'totalItems']),
   totalPrice: state.getIn([reducer, 'totalPrice']),
   messageNotif: state.getIn([reducer, 'notifMsg']),
+  customer : state.get('customer')
 });
 
 const constDispatchToProps = dispatch => ({

@@ -53,12 +53,18 @@ class Cart extends React.Component {
       const {product,qty,weight} = cartItem
       return(
       <Fragment key={index.toString()}>
-        <ListItem onClick = {()=>this.setState({showUpdateModal : true,cartItem:{...cartItem,...{}},cartItemIndex:index})} >
-          <figure style = {{width : 50,height : 50}} >
+        <ListItem  >
+          <figure onClick = {()=>this.setState({showUpdateModal : true,cartItem:{...cartItem,...{}},cartItemIndex:index})} style = {{width : 50,height : 50}} >
             <img src={product.images[0]} alt="thumb" />
           </figure>
           <ListItemText
             primary={`${product.title} ${product.weightEnabled ? weight : ''} ${product.defaultCombination && product.defaultCombination.value }`}
+            draggable
+            primaryTypographyProps = {{
+              style : {
+                fontSize : 12
+              }
+            }}
             secondary={
               <div>
               <p>
@@ -116,24 +122,58 @@ class Cart extends React.Component {
           (e) => {
             e.preventDefault()
             this.props.updateCart(this.state.cartItemIndex,this.state.cartItem)
+            this.setState({showUpdateModal : false})
           } 
         } >
         <DialogContent>
           {this.state.cartItem.product && this.state.cartItem.product.weightEnabled &&
            <FormControl>
-            <Input type = "number" value = {this.state.cartItem.weight} placeholder = "Weight" required />
+            <Input 
+              title = "Weight" 
+              type = "number" 
+              inputProps = {{
+                step : 0.01
+              }}
+              value = {this.state.cartItem.weight} 
+              placeholder = "Weight" 
+              onChange = {
+                (e) => {
+                  const cartItem = this.state.cartItem
+                  const newCartItem = {...cartItem}
+                  newCartItem.weight = e.target.value
+                  
+                  this.setState({cartItem:newCartItem})
+                }
+              }
+              required 
+            />
           </FormControl>
           }
           <FormControl>
-            <Input onChange = {
-              (e) => {
-                const cartItem = this.state.cartItem
-                const product = {...this.state.cartItem.product}
-                product.defaultCombination.sellPrice = e.target.value
-                const newCartItem = {...cartItem,...{product}}
-                this.setState({cartItem:newCartItem})
-              }
-            } type = "number" value = {this.state.cartItem.product && this.state.cartItem.product.defaultCombination.sellPrice} placeholder = "Price" required />
+            <Input 
+              title = "Sell Price"
+              onChange = {
+                (e) => {
+                  const cartItem = this.state.cartItem
+                  const newCartItem = {...cartItem}
+                  const product = newCartItem.product
+                  const newProduct = {...product}
+                  const defaultCombination = newProduct.defaultCombination
+                  const newDefaultCombination = {...defaultCombination}
+
+                  newDefaultCombination.sellPrice = e.target.value
+
+                  newProduct.defaultCombination = newDefaultCombination
+                  newCartItem.product = newProduct
+                  
+                  this.setState({cartItem:newCartItem})
+                }
+              } 
+              type = "number" 
+              value = {this.state.cartItem.product && this.state.cartItem.product.defaultCombination.sellPrice} 
+              placeholder = "Price" 
+              required 
+            />
           </FormControl>
         </DialogContent>
         <DialogActions>

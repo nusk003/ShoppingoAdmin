@@ -231,7 +231,10 @@ class ProductDetail extends React.Component {
 
               }
               {activeProduct.defaultCombination &&
-                <FormHelperText>Approx Rs.{(parseFloat(activeProduct.defaultCombination.sellPrice) * weight * (cartCount === 0 ? 1 : cartCount)).toFixed(2)}</FormHelperText>
+                <div>
+                  <FormHelperText>Approx Rs.{(parseFloat(activeProduct.defaultCombination.sellPrice) * weight * (cartCount === 0 ? 1 : cartCount)).toFixed(2)}</FormHelperText>
+                  <FormHelperText style = {{color : '#6a0dad'}} >{activeProduct.defaultCombination.seller}</FormHelperText>
+                </div>
               }
               
               {activeProduct.defaultCombination && activeProduct.defaultCombination.isStock && (

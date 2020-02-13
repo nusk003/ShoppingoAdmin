@@ -15,6 +15,7 @@ import {
   searchAction,
   closeNotifAction
 } from 'dan-actions/EcommerceActions';
+import { Card, CardHeader } from '@material-ui/core';
 
 class Ecommerce extends React.Component {
   state = {
@@ -65,6 +66,7 @@ class Ecommerce extends React.Component {
           <meta property="twitter:description" content={description} />
         </Helmet>
         <Notification close={() => closeNotif()} message={messageNotif} />
+      
         <SearchProduct
           dataCart={dataCart}
           dataProduct={dataProduct}
