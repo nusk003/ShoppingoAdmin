@@ -1,222 +1,129 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Field } from 'redux-form/immutable';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import {
-  Checkbox,
-  Select,
-  TextField,
-  Switch
-} from 'redux-form-material-ui';
-import {
-  fetchAction,
-  addAction,
-  closeAction,
-  submitAction,
-  removeAction,
-  editAction,
-  closeNotifAction
-} from 'dan-actions/CrudTbFrmActions';
-import { CrudTableForm, Notification,PapperBlock } from 'dan-components';
-import { anchorTable, dataApi } from '../Tables/demos/sampleData';
-import Downshift from 'downshift';
+import React from 'react';
+import { Helmet } from 'react-helmet';
+import brand from 'dan-api/dummy/brand';
+import { PapperBlock } from 'dan-components';
+import ProductAccordian from './ProductAccordian';
+import Axios from 'axios';
+import { host } from '../../../constants';
+import { Input, Button } from '@material-ui/core';
 
-const branch = 'crudTbFrmDemo';
+class BlankPage extends React.Component {
 
-const renderRadioGroup = ({ input, ...rest }) => (
-  <RadioGroup
-    {...input}
-    {...rest}
-    valueselected={input.value}
-    onChange={(event, value) => input.onChange(value)}
-  />
-);
-
-// validation functions
-const required = value => (value == null ? 'Required' : undefined);
-const email = value => (
-  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)
-    ? 'Invalid email'
-    : undefined
-);
-
-const styles = ({
-  root: {
-    flexGrow: 1,
-  },
-  field: {
-    width: '100%',
-    marginBottom: 20
-  },
-  fieldBasic: {
-    width: '100%',
-    marginBottom: 20,
-    marginTop: 10
-  },
-  inlineWrap: {
-    display: 'flex',
-    flexDirection: 'row'
+  state = {
+    categories : [],
+    brands : [],
+    products : [],
+    loading : false,
+    search : "",
+    next : true,
+    timeout : null
   }
-});
 
-class CrudTbFormDemo extends Component {
-  saveRef = ref => {
-    this.ref = ref;
-    return this.ref;
-  };
+  page = 1
+
+  componentDidMount(){
+    this.getBrands()
+    this.getCategories()
+    this.timeout = null
+  }
+
+  getCategories = () => {
+    Axios.get(`${host}/products/admin/get-categories/`)
+    .then(({data})=>{
+      this.setState({categories : data})
+    })
+    .catch(error=>{
+      alert(error.message)
+    })
+  }
+
+  searchProducts = () => {
+
+    const {search} = this.state
+    if (!this.state.next){
+      return
+    }
+    this.setState({loading : true})
+    Axios.get(`${host}/products/admin/get-products/?${search && search !== "" ? `search=${search}&` : ''}page_size=${search ? `5` : `5`}&page=${this.page}`)
+    .then(({data})=>{
+      const products = this.state.products
+      const newProducts = products.concat(data.results)
+      this.page += 1
+      this.setState({products : newProducts,loading : false,next : data.next !== null})
+      
+    })
+    .catch(error=>{
+      alert(error.message)
+      this.setState({loading : false})
+    })
+  }
+
+  getProducts = (e) => {
+    const search = e.target.value
+    this.page = 1
+    this.setState({search,products : [],next : true})
+    if (this.state.timeout){
+      clearTimeout(this.state.timeout)
+    }
+
+    this.setState({timeout : setTimeout(()=>this.searchProducts(),300)})
+
+  }
+
+  seeMoreHandler =  () => {
+    this.searchProducts()
+  }
+
+  seeAllHandler = () => {
+    this.page = 1
+    this.setState({search : "",products : [],next : true})
+    this.searchProducts()
+  }
+
+  getBrands = () => {
+    Axios.get(`${host}/products/admin/get-brands/`)
+    .then(({data})=>{
+      this.setState({brands : data})
+    })
+    .catch(error=>{
+      alert(error.message)
+    })
+  }
 
   render() {
-    const {
-      classes,
-      fetchData,
-      addNew,
-      closeForm,
-      submit,
-      removeRow,
-      editRow,
-      dataTable,
-      openForm,
-      initValues,
-      closeNotif,
-      messageNotif,
-    } = this.props;
-    const trueBool = true;
+    const title = brand.name + ' - Products';
+    const description = brand.desc;
+    const {categories,brands,products,loading,next} = this.state
     return (
-        <PapperBlock whiteBg icon="ios-create-outline" title="Products" desc="All your products at one place">
-
       <div>
-        <Notification close={() => closeNotif(branch)} message={messageNotif} />
-        <div className={classes.rootTable}>
-          <CrudTableForm
-            dataTable={dataTable}
-            openForm={openForm}
-            dataInit={dataApi}
-            anchor={anchorTable}
-            title="Product List"
-            fetchData={fetchData}
-            addNew={addNew}
-            closeForm={closeForm}
-            submit={submit}
-            removeRow={removeRow}
-            editRow={editRow}
-            branch={branch}
-            initValues={initValues}
-          >
-            {/* Create Your own form, then arrange or custom it as You like */}
-            <div>
-              <Field
-                name="title"
-                component={TextField}
-                placeholder="Product Title"
-                label="Title"
-                validate={required}
-                required
-                ref={this.saveRef}
-                className={classes.field}
-              />
-            </div>
-            <div>
-              <Field
-                name="email"
-                component={TextField}
-                placeholder="Email Field"
-                label="Email"
-                required
-                validate={[required, email]}
-                className={classes.field}
-              />
-            </div>
-            <div className={classes.fieldBasic}>
-              <FormLabel component="label">Choose One Option</FormLabel>
-              <Field name="radio" className={classes.inlineWrap} component={renderRadioGroup}>
-                <FormControlLabel value="option1" control={<Radio />} label="Option 1" />
-                <FormControlLabel value="option2" control={<Radio />} label="Option 2" />
-              </Field>
-            </div>
-            <div>
-              <Downshift
-                placeholder = "search"
-              >
-
-              </Downshift>
-            </div>
-            <div className={classes.fieldBasic}>
-              <FormLabel component="label">Toggle Input</FormLabel>
-              <div className={classes.inlineWrap}>
-                <FormControlLabel control={<Field name="onof" component={Switch} />} label="On/OF Switch" />
-                <FormControlLabel control={<Field name="checkbox" component={Checkbox} />} label="Checkbox" />
-              </div>
-            </div>
-            <div className={classes.field}>
-              <Field
-                name="textarea"
-                className={classes.field}
-                component={TextField}
-                placeholder="Textarea"
-                label="Textarea"
-                multiline={trueBool}
-                rows={4}
-              />
-            </div>
-            {/* No need create button or submit, because that already made in this component */}
-          </CrudTableForm>
-        </div>
+        <Helmet>
+          <title>{title}</title>
+          <meta name="description" content={description} />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+          <meta property="twitter:title" content={title} />
+          <meta property="twitter:description" content={description} />
+        </Helmet>
+        <PapperBlock title="View Products" desc="All your products at one place">
+          <Input placeholder = "Search Products" onChange = {this.getProducts} />
+          <Button onClick = {this.seeAllHandler} >Show All</Button>
+          {products.map((product,i)=>
+            <ProductAccordian key = {i} product = {product} categories = {categories} brands = {brands} />
+          )}
+          
+          {loading ?
+          <p>Loading...</p>
+          :
+          next &&
+          <Button onClick = {this.seeMoreHandler} >
+            See More
+          </Button>
+          }
+          
+        </PapperBlock>
       </div>
-      </PapperBlock>
     );
   }
 }
 
-renderRadioGroup.propTypes = {
-  input: PropTypes.object.isRequired,
-};
-
-CrudTbFormDemo.propTypes = {
-  dataTable: PropTypes.object.isRequired,
-  openForm: PropTypes.bool.isRequired,
-  classes: PropTypes.object.isRequired,
-  fetchData: PropTypes.func.isRequired,
-  addNew: PropTypes.func.isRequired,
-  closeForm: PropTypes.func.isRequired,
-  submit: PropTypes.func.isRequired,
-  removeRow: PropTypes.func.isRequired,
-  editRow: PropTypes.func.isRequired,
-  initValues: PropTypes.object.isRequired,
-  closeNotif: PropTypes.func.isRequired,
-  messageNotif: PropTypes.string.isRequired,
-};
-
-
-const mapStateToProps = state => ({
-  force: state, // force state from reducer
-  initValues: state.getIn([branch, 'formValues']),
-  dataTable: state.getIn([branch, 'dataTable']),
-  openForm: state.getIn([branch, 'showFrm']),
-  messageNotif: state.getIn([branch, 'notifMsg']),
-});
-
-const mapDispatchToProps = dispatch => ({
-  fetchData: bindActionCreators(fetchAction, dispatch),
-  addNew: bindActionCreators(addAction, dispatch),
-  closeForm: bindActionCreators(closeAction, dispatch),
-  submit: bindActionCreators(submitAction, dispatch),
-  removeRow: bindActionCreators(removeAction, dispatch),
-  editRow: bindActionCreators(editAction, dispatch),
-  closeNotif: bindActionCreators(closeNotifAction, dispatch),
-});
-
-const CrudTbFormDemoMapped = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CrudTbFormDemo);
-
-export default withStyles(styles)(CrudTbFormDemoMapped);
+export default BlankPage;

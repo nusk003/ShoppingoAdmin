@@ -41,6 +41,7 @@ class Application extends React.Component {
         <Switch>
           
           { /* Home */ }
+          <Route exact path = "/app/products" component = {ViewProducts} />
           <Route exact path="/app" component={PersonalDashboard} />
           <Route path="/app/crm-dashboard" component={CrmDashboard} />
           <Route path="/app/crypto-dashboard" component={CryptoDashboard} />
