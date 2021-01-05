@@ -101,7 +101,7 @@
     "acorn": "^6.1.1",
     "antd": "^4.2.5",
     "autosuggest-highlight": "^3.1.1",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "babel-polyfill": "6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
